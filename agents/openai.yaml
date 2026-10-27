@@ -1,4 +1,4 @@
 interface:
   display_name: "Init Work"
   short_description: "작업 공간과 초기 문서를 만들고 계획·진행·결정 기록을 설정합니다"
-  default_prompt: "Use $init-work to initialize a task workspace and planning, progress, and decision documents in my target Git repository."
+  default_prompt: "Use $init-work to initialize a task workspace and planning, progress, and decision documents in my project, choosing the output path automatically or manually."
