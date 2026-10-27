@@ -6,20 +6,20 @@
 
 설치에는 Node.js와 npm(`npx`), Git이 필요하다. 작업 생성에는 [uv](https://docs.astral.sh/uv/getting-started/installation/)가 필요하며, Python 3.11+와 스크립트 의존성은 `uv`가 준비한다.
 
-설치 원본은 GitHub 저장소 [`devwogns/init-work`](https://github.com/devwogns/init-work)다.
+설치 원본은 GitHub 저장소 <https://github.com/devwogns/init-work>다.
 
 ### 다른 프로젝트에 설치
 
 **설치할 대상 프로젝트 루트에서** 실행한다. 아래 명령은 Codex와 Claude Code에 `init-work` 하나만 설치한다. 한 에이전트만 사용한다면 `--agent codex` 또는 `--agent claude-code`로 바꾼다.
 
 ```text
-npx skills add devwogns/init-work --skill init-work --agent codex claude-code --yes
+npx skills add https://github.com/devwogns/init-work --skill init-work --agent codex claude-code --yes
 ```
 
 여러 프로젝트에서 공통으로 사용하려면 같은 명령에 `--global`을 추가한다.
 
 ```text
-npx skills add devwogns/init-work --skill init-work --agent codex claude-code --global --yes
+npx skills add https://github.com/devwogns/init-work --skill init-work --agent codex claude-code --global --yes
 ```
 
 저장소가 비공개인 동안에는 설치하는 계정에 이 저장소의 읽기 권한이 있어야 하며, clone할 수 있도록 Git 인증을 먼저 설정한다. 원격 명령은 GitHub의 main에 반영된 최신 내용을 설치한다. 아직 반영하지 않은 변경은 아래 로컬 설치로 확인한다.

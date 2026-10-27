@@ -57,7 +57,7 @@ def test_skill_version_matches_latest_changelog_release() -> None:
 def test_readme_installs_from_repository_address() -> None:
     # Given / When / Then: install commands name the real repository, not a placeholder.
     assert "OWNER/REPO" not in README
-    assert "npx skills add devwogns/init-work --skill init-work" in README
+    assert "npx skills add https://github.com/devwogns/init-work --skill init-work" in README
     assert "github.com/devwogns/init-work/tree/v" in README
 
 
