@@ -6,23 +6,31 @@
 
 설치에는 Node.js와 npm(`npx`), Git이 필요하다. 작업 생성에는 [uv](https://docs.astral.sh/uv/getting-started/installation/)가 필요하며, Python 3.11+와 스크립트 의존성은 `uv`가 준비한다.
 
-아래 `OWNER/REPO`는 배포할 GitHub 저장소로 바꾸는 자리표시자다. 아직 배포 주소가 정해지지 않았으므로 현재는 로컬 원본 설치로 확인한다.
+설치 원본은 GitHub 저장소 [`devwogns/init-work`](https://github.com/devwogns/init-work)다.
 
 ### 다른 프로젝트에 설치
 
 **설치할 대상 프로젝트 루트에서** 실행한다. 아래 명령은 Codex와 Claude Code에 `init-work` 하나만 설치한다. 한 에이전트만 사용한다면 `--agent codex` 또는 `--agent claude-code`로 바꾼다.
 
 ```text
-npx skills add OWNER/REPO --skill init-work --agent codex claude-code --yes
+npx skills add devwogns/init-work --skill init-work --agent codex claude-code --yes
 ```
 
 여러 프로젝트에서 공통으로 사용하려면 같은 명령에 `--global`을 추가한다.
 
 ```text
-npx skills add OWNER/REPO --skill init-work --agent codex claude-code --global --yes
+npx skills add devwogns/init-work --skill init-work --agent codex claude-code --global --yes
 ```
 
-비공개 저장소도 같은 명령을 사용하며, 해당 GitHub 저장소를 clone할 수 있도록 Git 인증을 먼저 설정한다. 원격 명령은 서버에 반영된 버전을 설치한다. 아직 반영하지 않은 변경은 아래 로컬 설치로 확인한다.
+저장소가 비공개인 동안에는 설치하는 계정에 이 저장소의 읽기 권한이 있어야 하며, clone할 수 있도록 Git 인증을 먼저 설정한다. 원격 명령은 GitHub의 main에 반영된 최신 내용을 설치한다. 아직 반영하지 않은 변경은 아래 로컬 설치로 확인한다.
+
+### 특정 버전 설치
+
+배포한 버전은 `vX.Y.Z` 태그로 남는다(변경 내용은 `CHANGELOG.md`). 저장소 주소 대신 태그를 가리키는 주소를 넘기면 그 버전을 설치한다. `--global` 등 나머지 옵션은 위와 같다.
+
+```text
+npx skills add https://github.com/devwogns/init-work/tree/v0.1.0 --skill init-work --agent codex claude-code --yes
+```
 
 ### 로컬 원본에서 설치
 
@@ -48,7 +56,7 @@ CLI는 대상 에이전트에 맞는 설치 위치와 연결을 관리한다. �
 
 ## 독립 GitHub 저장소 구성
 
-이 폴더를 `init-work` 스킬의 관리 저장소로 사용한다. 아래 배포 파일을 저장소 루트에서 관리하며, 원래 프로젝트의 문서·작업 기록·Git 이력·에이전트 설정은 포함하지 않는다.
+이 폴더를 `init-work` 스킬의 관리 저장소([`devwogns/init-work`](https://github.com/devwogns/init-work))로 사용한다. 아래 배포 파일을 저장소 루트에서 관리하며, 원래 프로젝트의 문서·작업 기록·Git 이력·에이전트 설정은 포함하지 않는다.
 
 ```text
 <repository>/
@@ -64,7 +72,7 @@ CLI는 대상 에이전트에 맞는 설치 위치와 연결을 관리한다. �
 
 `assets/task-template/` 아래의 `CLAUDE.md`와 `variants/global/AGENTS.md`·`variants/sub/AGENTS.md`는 배포에 필요한 범용 템플릿이다. 서브용 작업 생성 뒤 대상 저장소에서 로컬 지침으로 제외되는 파일과 구분한다. 관리 저장소의 `.gitignore`는 `.remember/`, `tasks/`, Python 캐시·가상환경, `node_modules/`를 Git 추적 대상에서 제외한다. 이 파일들은 배포 원본에도 포함하지 않는다. 대상 프로젝트에 서브용 작업을 생성할 때는 `.gitignore`를 변경하지 않고 Git의 `info/exclude`에 로컬 지침 경로만 추가한다.
 
-비공개 저장소에서 먼저 설치를 확인하고 공개 여부는 별도로 결정한다. 공개 전에는 저장소 주소를 실제 값으로 교체하고 배포할 파일과 라이선스를 확인한다. 이 스킬의 작업 생성 절차는 저장소 생성·커밋·푸시·공개 전환을 수행하지 않는다.
+저장소는 비공개로 운영하며 공개 여부는 별도로 결정한다. 공개 전에는 배포할 파일과 라이선스를 확인한다. 이 스킬의 작업 생성 절차는 저장소 생성·커밋·푸시·공개 전환을 수행하지 않는다.
 
 ### 로컬 설치용 원본 준비
 
@@ -110,7 +118,7 @@ $skillExport
 | MINOR | 기존 사용법을 유지한 기능 추가 |
 | PATCH | 버그 수정, 문구 정리, 동작이 같은 내부 변경 |
 
-1.0.0 전에는 호환을 깨는 변경도 MINOR로 올릴 수 있으며, 이 경우 `CHANGELOG.md`에 `변경` 항목으로 밝힌다. 배포 파일이 바뀌지 않는 변경(관리 저장소의 `AGENTS.md`·`CLAUDE.md`, `.remember/` 등)은 버전을 올리지 않는다.
+1.0.0 전에는 호환을 깨는 변경도 MINOR로 올릴 수 있으며, 이 경우 `CHANGELOG.md`에 `변경` 항목으로 밝힌다. 배포 파일이 바뀌지 않는 변경(관리 저장소의 `AGENTS.md`·`CLAUDE.md`, `.remember/` 등)과 설명 문서(`README.md`·`CHANGELOG.md`)만 바뀌는 변경은 버전을 올리지 않는다. 설명 변경은 `[Unreleased]`에 적어 두고 다음 배포 버전에 포함한다.
 
 배포 절차는 다음과 같다.
 

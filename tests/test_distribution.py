@@ -54,6 +54,13 @@ def test_skill_version_matches_latest_changelog_release() -> None:
     assert releases[0] == skill_version()
 
 
+def test_readme_installs_from_repository_address() -> None:
+    # Given / When / Then: install commands name the real repository, not a placeholder.
+    assert "OWNER/REPO" not in README
+    assert "npx skills add devwogns/init-work --skill init-work" in README
+    assert "github.com/devwogns/init-work/tree/v" in README
+
+
 def test_readme_describes_path_selection_instead_of_fixed_tasks_folder() -> None:
     # Given / When / Then: the removed fixed location and option are gone.
     assert "tasks/<" not in README
