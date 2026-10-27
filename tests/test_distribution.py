@@ -4,6 +4,8 @@ import re
 from pathlib import Path
 from typing import Final
 
+from generator_helpers import SKILL_DIR
+
 ROOT: Final = Path(__file__).parents[1]
 README: Final = (ROOT / "README.md").read_text(encoding="utf-8")
 SEMVER: Final = r"\d+\.\d+\.\d+"
@@ -16,12 +18,11 @@ def readme_export_list() -> set[str]:
 
 
 def distribution_files() -> set[str]:
-    files = {".gitignore", "SKILL.md", "README.md", "CHANGELOG.md"}
-    for folder in ("agents", "scripts", "assets", "tests"):
-        for path in (ROOT / folder).rglob("*"):
-            if path.is_file() and "__pycache__" not in path.parts:
-                files.add(path.relative_to(ROOT).as_posix())
-    return files
+    return {
+        path.relative_to(SKILL_DIR).as_posix()
+        for path in SKILL_DIR.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    }
 
 
 def test_readme_export_list_matches_distribution_files() -> None:
@@ -30,8 +31,18 @@ def test_readme_export_list_matches_distribution_files() -> None:
     assert readme_export_list() == distribution_files()
 
 
+def test_skill_folder_carries_no_repository_instructions() -> None:
+    # Given: installers copy the whole folder that holds SKILL.md.
+    # When / Then: only the skill folder holds SKILL.md, so the repository's own
+    # AGENTS.md and CLAUDE.md never reach an install.
+    assert not (ROOT / "SKILL.md").exists()
+    assert (ROOT / "AGENTS.md").exists()
+    for name in ("AGENTS.md", "CLAUDE.md", "README.md", "CHANGELOG.md", ".gitignore"):
+        assert not (SKILL_DIR / name).exists(), name
+
+
 def skill_version() -> str:
-    skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+    skill = (SKILL_DIR / "SKILL.md").read_text(encoding="utf-8")
     frontmatter = re.match(r"---\n(.*?)\n---\n", skill, re.DOTALL)
     assert frontmatter is not None
     version = re.search(

@@ -29,12 +29,14 @@ npx skills add https://github.com/devwogns/init-work --skill init-work --agent c
 배포한 버전은 `vX.Y.Z` 태그로 남는다(변경 내용은 `CHANGELOG.md`). 저장소 주소 대신 태그를 가리키는 주소를 넘기면 그 버전을 설치한다. `--global` 등 나머지 옵션은 위와 같다.
 
 ```text
-npx skills add https://github.com/devwogns/init-work/tree/v0.1.0 --skill init-work --agent codex claude-code --yes
+npx skills add https://github.com/devwogns/init-work/tree/v0.1.1 --skill init-work --agent codex claude-code --yes
 ```
+
+`v0.1.0`은 저장소 루트를 스킬 폴더로 쓰던 구조라 관리 저장소의 `AGENTS.md`·`CLAUDE.md`·테스트까지 함께 설치된다. `v0.1.1`부터는 `skills/init-work/`만 설치된다.
 
 ### 로컬 원본에서 설치
 
-대상 프로젝트 루트에서 실행한다. `<skill-source>`를 `SKILL.md`, `scripts/`, `assets/` 등 배포 파일만 들어 있는 폴더의 절대 경로로 바꾼다. 로컬 작업 기록이나 캐시가 있는 관리 저장소에서는 먼저 아래 [로컬 설치용 원본 준비](#로컬-설치용-원본-준비)를 따른다.
+대상 프로젝트 루트에서 실행한다. `<skill-source>`를 `SKILL.md`, `agents/`, `scripts/`, `assets/` 등 배포 파일만 들어 있는 폴더의 절대 경로로 바꾼다. 로컬 작업 기록이나 캐시가 있는 관리 저장소에서는 먼저 아래 [로컬 설치용 원본 준비](#로컬-설치용-원본-준비)를 따른다.
 
 ```text
 npx skills add "<skill-source>" --skill init-work --agent codex claude-code --yes
@@ -50,53 +52,52 @@ npx skills list
 
 전역 설치는 `npx skills list --global`로 확인한다. 실행 중인 에이전트에서 보이지 않으면 새 세션에서 스킬을 호출한다. Windows 등에서 심볼릭 링크를 사용할 수 없으면 설치 명령에 `--copy`를 추가한다.
 
-CLI는 대상 에이전트에 맞는 설치 위치와 연결을 관리한다. 별도 npm 패키지나 설치 스크립트는 필요하지 않다. 다른 파일을 참조하는 진입점만 복사하지 말고, 아래의 완전한 스킬 폴더를 설치 원본으로 사용한다.
+CLI는 대상 에이전트에 맞는 설치 위치와 연결을 관리한다. 별도 npm 패키지나 설치 스크립트는 필요하지 않다. 다른 파일을 참조하는 진입점만 복사하지 말고, 아래의 완전한 스킬 폴더(`skills/init-work/`)를 설치 원본으로 사용한다.
 
 명령 옵션과 설치 범위는 [공식 CLI 문서](https://github.com/vercel-labs/skills/blob/main/docs/commands.md#skills-add)를 따른다.
 
 ## 독립 GitHub 저장소 구성
 
-이 폴더를 `init-work` 스킬의 관리 저장소([`devwogns/init-work`](https://github.com/devwogns/init-work))로 사용한다. 아래 배포 파일을 저장소 루트에서 관리하며, 원래 프로젝트의 문서·작업 기록·Git 이력·에이전트 설정은 포함하지 않는다.
+이 폴더를 `init-work` 스킬의 관리 저장소([`devwogns/init-work`](https://github.com/devwogns/init-work))로 사용한다. 원래 프로젝트의 문서·작업 기록·Git 이력·에이전트 설정은 포함하지 않는다.
 
 ```text
 <repository>/
-├── .gitignore
-├── SKILL.md
+├── AGENTS.md             관리 저장소 기여 지침(설치되지 않음)
+├── CLAUDE.md
 ├── README.md
 ├── CHANGELOG.md
-├── agents/openai.yaml
-├── scripts/create_task.py
-├── assets/task-template/
+├── .gitignore
+├── skills/init-work/     배포되는 스킬 폴더
+│   ├── SKILL.md
+│   ├── agents/openai.yaml
+│   ├── scripts/create_task.py
+│   └── assets/task-template/
 └── tests/
 ```
 
-`assets/task-template/` 아래의 `CLAUDE.md`와 `variants/global/AGENTS.md`·`variants/sub/AGENTS.md`는 배포에 필요한 범용 템플릿이다. 서브용 작업 생성 뒤 대상 저장소에서 로컬 지침으로 제외되는 파일과 구분한다. 관리 저장소의 `.gitignore`는 `.remember/`, `tasks/`, Python 캐시·가상환경, `node_modules/`를 Git 추적 대상에서 제외한다. 이 파일들은 배포 원본에도 포함하지 않는다. 대상 프로젝트에 서브용 작업을 생성할 때는 `.gitignore`를 변경하지 않고 Git의 `info/exclude`에 로컬 지침 경로만 추가한다.
+설치 CLI는 `SKILL.md`가 들어 있는 폴더를 통째로 설치한다. 그래서 배포 파일은 `skills/init-work/`에만 두고, 저장소 루트의 지침·README·CHANGELOG·테스트는 설치되지 않는 관리용 파일로 둔다. 스킬 폴더에는 `AGENTS.md`·`CLAUDE.md`를 두지 않으며, `tests/test_distribution.py`가 이를 검사한다.
+
+`skills/init-work/assets/task-template/` 아래의 `CLAUDE.md`와 `variants/global/AGENTS.md`·`variants/sub/AGENTS.md`는 배포에 필요한 범용 템플릿이다. 서브용 작업 생성 뒤 대상 저장소에서 로컬 지침으로 제외되는 파일과 구분한다. 관리 저장소의 `.gitignore`는 `.remember/`, `tasks/`, Python 캐시·가상환경, `node_modules/`를 Git 추적 대상에서 제외한다. 이 파일들은 배포 원본에도 포함하지 않는다. 대상 프로젝트에 서브용 작업을 생성할 때는 `.gitignore`를 변경하지 않고 Git의 `info/exclude`에 로컬 지침 경로만 추가한다.
 
 저장소는 비공개로 운영하며 공개 여부는 별도로 결정한다. 공개 전에는 배포할 파일과 라이선스를 확인한다. 이 스킬의 작업 생성 절차는 저장소 생성·커밋·푸시·공개 전환을 수행하지 않는다.
 
 ### 로컬 설치용 원본 준비
 
-`skills` 1.7.4에서 로컬 설치가 `.gitignore`에 등록된 파일도 복사하는 것을 확인했다. `.gitignore`만으로 설치 파일을 제한할 수 없으므로, 관리 저장소에서 설치할 때는 아래처럼 배포 파일만 별도 임시 폴더로 복사한다. 파일 목록은 새 배포 파일을 추가할 때 함께 갱신한다.
+`skills` 1.7.4에서 로컬 설치가 `.gitignore`에 등록된 파일도 복사하는 것을 확인했다. 테스트를 실행하면 `skills/init-work/scripts/`에 Python 캐시(`__pycache__/`)가 생길 수 있으므로, 관리 저장소에서 설치할 때는 아래처럼 배포 파일만 별도 임시 폴더로 복사한다. 파일 목록은 스킬 폴더에 파일을 추가할 때 함께 갱신한다.
 
 관리 저장소 루트에서 실행하는 PowerShell 예시다. 원본을 수정하거나 Git에 파일을 추가하지 않는다.
 
 ```powershell
-$skillSource = (Get-Location).Path
+$skillSource = Join-Path (Get-Location).Path 'skills/init-work'
 $skillExport = Join-Path ([System.IO.Path]::GetTempPath()) ('init-work-export-' + [guid]::NewGuid().ToString('N'))
 $skillFiles = @(
-    '.gitignore', 'SKILL.md', 'README.md', 'CHANGELOG.md', 'agents/openai.yaml',
+    'SKILL.md', 'agents/openai.yaml',
     'scripts/create_task.py',
     'assets/task-template/CLAUDE.md', 'assets/task-template/README.md',
     'assets/task-template/ROADMAP.md', 'assets/task-template/PROGRESS.md',
     'assets/task-template/decisions.md', 'assets/task-template/evidence/README.md',
     'assets/task-template/variants/global/AGENTS.md',
-    'assets/task-template/variants/sub/AGENTS.md',
-    'tests/conftest.py', 'tests/generator_helpers.py',
-    'tests/test_auto_mode.py', 'tests/test_create_task.py',
-    'tests/test_distribution.py', 'tests/test_local_instructions.py',
-    'tests/test_manual_mode.py', 'tests/test_paths.py',
-    'tests/test_placement.py', 'tests/test_precheck.py',
-    'tests/test_skill_contract.py', 'tests/test_templates.py'
+    'assets/task-template/variants/sub/AGENTS.md'
 )
 foreach ($skillFile in $skillFiles) {
     $skillDestination = Join-Path $skillExport $skillFile
@@ -110,7 +111,7 @@ $skillExport
 
 ## 버전 관리
 
-스킬 버전은 `SKILL.md` frontmatter의 `metadata.version` 값 하나를 기준으로 하며, 설치된 스킬에서도 같은 값을 확인할 수 있다. 버전은 [유의적 버전](https://semver.org/lang/ko/)(`MAJOR.MINOR.PATCH`)을 따르고 변경 내용은 `CHANGELOG.md`에 기록한다. main의 각 배포 커밋에는 같은 번호의 주석 태그 `vX.Y.Z`를 붙인다.
+스킬 버전은 `skills/init-work/SKILL.md` frontmatter의 `metadata.version` 값 하나를 기준으로 하며, 설치된 스킬에서도 같은 값을 확인할 수 있다. 버전은 [유의적 버전](https://semver.org/lang/ko/)(`MAJOR.MINOR.PATCH`)을 따르고 변경 내용은 `CHANGELOG.md`에 기록한다. main의 각 배포 커밋에는 같은 번호의 주석 태그 `vX.Y.Z`를 붙인다.
 
 | 올릴 자리 | 기준 |
 |---|---|
@@ -118,7 +119,7 @@ $skillExport
 | MINOR | 기존 사용법을 유지한 기능 추가 |
 | PATCH | 버그 수정, 문구 정리, 동작이 같은 내부 변경 |
 
-1.0.0 전에는 호환을 깨는 변경도 MINOR로 올릴 수 있으며, 이 경우 `CHANGELOG.md`에 `변경` 항목으로 밝힌다. 배포 파일이 바뀌지 않는 변경(관리 저장소의 `AGENTS.md`·`CLAUDE.md`, `.remember/` 등)과 설명 문서(`README.md`·`CHANGELOG.md`)만 바뀌는 변경은 버전을 올리지 않는다. 설명 변경은 `[Unreleased]`에 적어 두고 다음 배포 버전에 포함한다.
+1.0.0 전에는 호환을 깨는 변경도 MINOR로 올릴 수 있으며, 이 경우 `CHANGELOG.md`에 `변경` 항목으로 밝힌다. `skills/init-work/` 밖만 바뀌는 변경(관리 저장소의 `AGENTS.md`·`CLAUDE.md`, `README.md`·`CHANGELOG.md` 설명, 테스트, `.remember/` 등)은 버전을 올리지 않는다. 설명 변경은 `[Unreleased]`에 적어 두고 다음 배포 버전에 포함한다.
 
 배포 절차는 다음과 같다.
 
@@ -186,7 +187,7 @@ $init-work
     └── README.md
 ```
 
-원본 템플릿은 `assets/task-template/`에 있으며 생성 결과에는 스킬 문서나 실행 스크립트가 포함되지 않는다. 7개 문서 중 하나라도 이미 있으면 덮어쓰지 않고 아무것도 바꾸지 않은 채 중지하며, 다른 경로로 조용히 우회하지 않는다. 생성 폴더가 이미 있어도(빈 폴더 포함) 7개 문서가 없으면 그 안에 생성한다. 상위 경로나 `evidence`가 일반 파일이거나 `evidence`가 링크이면 중지한다. 사전 검사를 통과한 뒤 쓰기 도중 실패하면 되돌리지 않고 이번 실행이 만든 항목을 `created:` 줄로 보고한다.
+원본 템플릿은 스킬 폴더의 `assets/task-template/`에 있으며 생성 결과에는 스킬 문서나 실행 스크립트가 포함되지 않는다. 7개 문서 중 하나라도 이미 있으면 덮어쓰지 않고 아무것도 바꾸지 않은 채 중지하며, 다른 경로로 조용히 우회하지 않는다. 생성 폴더가 이미 있어도(빈 폴더 포함) 7개 문서가 없으면 그 안에 생성한다. 상위 경로나 `evidence`가 일반 파일이거나 `evidence`가 링크이면 중지한다. 사전 검사를 통과한 뒤 쓰기 도중 실패하면 되돌리지 않고 이번 실행이 만든 항목을 `created:` 줄로 보고한다.
 
 알려진 결과: GitHub에서 `README.md`와 함께 만든 저장소나 `uv init`처럼 루트에 `README.md`를 만드는 새 프로젝트에서는 루트 생성(자동 전역용, 직접 입력한 저장소 루트)이 충돌로 중지된다. `docs/`를 문서 사이트 원본으로 쓰는 저장소에서는 자동 서브용 문서가 사이트 빌드에 포함될 수 있으므로, 최종 확인에서 경로를 보고 필요하면 직접 입력한다.
 
@@ -229,18 +230,18 @@ uv run "<skill-dir>/scripts/create_task.py" --run-dir "<run-dir>" --target '<PAT
 | `{{ADDITIONAL_EDIT_SCOPE_OR_NONE}}` | 작업 폴더 밖의 편집 허용 경로 또는 `없음`(전역용은 항상 `없음`) |
 | `{{INITIAL_NEXT_ACTION}}` | 참조 경로 유무에 따라 파생한 최초 다음 행동 |
 
-템플릿 토큰을 추가하거나 제거할 때는 `SKILL.md`, `scripts/create_task.py`, 테스트를 함께 갱신한다. `AGENTS.md`는 `variants/global/`과 `variants/sub/`에 변형별로 두고 나머지 문서는 공유한다. 변형 폴더에 같은 경로의 파일이 있으면 공유 파일 대신 사용한다. 미치환 토큰 검사와 토큰 집합 일치 검사는 두 변형 모두에 적용된다.
+템플릿 토큰을 추가하거나 제거할 때는 `skills/init-work/` 아래의 `SKILL.md`·`scripts/create_task.py`와 테스트를 함께 갱신한다. `AGENTS.md`는 `variants/global/`과 `variants/sub/`에 변형별로 두고 나머지 문서는 공유한다. 변형 폴더에 같은 경로의 파일이 있으면 공유 파일 대신 사용한다. 미치환 토큰 검사와 토큰 집합 일치 검사는 두 변형 모두에 적용된다.
 
 ## 검증
 
-`SKILL.md`가 있는 원본 스킬 폴더에서 실행한다.
+관리 저장소 루트에서 실행한다.
 
 ```text
 uv run --with pytest --with typer --with pydantic pytest tests -q
-uv run scripts/create_task.py --help
+uv run skills/init-work/scripts/create_task.py --help
 ```
 
-설치 검색은 `npx skills add . --list`로 확인하며, 표시되는 이름은 `init-work`여야 한다. 위 절차로 준비한 배포 파일만 별도 임시 Git 저장소에 로컬 설치한 뒤, 설치된 스크립트로 전역용(빈 Git 저장소 루트)과 서브용(루트에 `AGENTS.md`가 있는 저장소)을 각각 생성하여 두 경우 모두 문서 7개가 만들어지고 템플릿이 함께 배포되는지 확인한다. 설치 폴더에 `.remember/`, 실제 작업 폴더, 캐시가 없는지도 확인한다. `tests/test_distribution.py`는 위 배포 파일 목록이 실제 배포 파일과 일치하는지 검사한다.
+설치 검색은 `npx skills add . --list`로 확인하며, 표시되는 이름은 `init-work`여야 한다. 위 절차로 준비한 배포 파일만 별도 임시 Git 저장소에 로컬 설치한 뒤, 설치된 스크립트로 전역용(빈 Git 저장소 루트)과 서브용(루트에 `AGENTS.md`가 있는 저장소)을 각각 생성하여 두 경우 모두 문서 7개가 만들어지고 템플릿이 함께 배포되는지 확인한다. 설치 폴더에 `.remember/`, 관리 저장소의 `AGENTS.md`·`CLAUDE.md`, 테스트, 실제 작업 폴더, 캐시가 없는지도 확인한다. `tests/test_distribution.py`는 위 배포 파일 목록이 스킬 폴더의 실제 파일과 일치하는지 검사한다.
 
 비공개 배포 준비나 로컬 설치 검증에서는 [CLI 문서](https://skills.sh/docs/cli#telemetry)에 따라 `DISABLE_TELEMETRY=1`을 설정한다. PowerShell에서는 실행 전에 `$env:DISABLE_TELEMETRY = '1'`을 사용한다.
 

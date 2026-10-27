@@ -6,10 +6,10 @@ import sys
 from pathlib import Path
 from typing import Final
 
-from generator_helpers import SCRIPT_PATH
+from generator_helpers import SCRIPT_PATH, SKILL_DIR
 
-SKILL: Final = (Path(__file__).parents[1] / "SKILL.md").read_text(encoding="utf-8")
-AGENT_CONFIG: Final = (Path(__file__).parents[1] / "agents" / "openai.yaml").read_text(
+SKILL: Final = (SKILL_DIR / "SKILL.md").read_text(encoding="utf-8")
+AGENT_CONFIG: Final = (SKILL_DIR / "agents" / "openai.yaml").read_text(
     encoding="utf-8",
 )
 

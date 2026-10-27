@@ -4,8 +4,11 @@
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-27
+
 ### 변경
 
+- 스킬을 저장소 루트에서 `skills/init-work/`로 옮겼다. 설치 CLI가 `SKILL.md`가 있는 폴더를 통째로 설치하므로, 이제 설치본에는 `SKILL.md`·`agents/`·`scripts/`·`assets/`만 들어간다. 관리 저장소의 `AGENTS.md`·`CLAUDE.md`, `README.md`, `CHANGELOG.md`, 테스트는 더 이상 설치되지 않는다. 설치 명령은 그대로다.
 - README 설치 안내의 `OWNER/REPO` 자리표시자를 실제 저장소 URL `https://github.com/devwogns/init-work`로 바꾸고, `vX.Y.Z` 태그 주소로 특정 버전을 설치하는 방법을 추가했다.
 
 ## [0.1.0] - 2026-10-27

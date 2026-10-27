@@ -12,8 +12,9 @@ from pathlib import Path
 from types import ModuleType
 from typing import Final
 
-SCRIPT_PATH: Final = Path(__file__).parents[1] / "scripts" / "create_task.py"
-BUNDLED_TEMPLATE_DIR: Final = Path(__file__).parents[1] / "assets" / "task-template"
+SKILL_DIR: Final = Path(__file__).parents[1] / "skills" / "init-work"
+SCRIPT_PATH: Final = SKILL_DIR / "scripts" / "create_task.py"
+BUNDLED_TEMPLATE_DIR: Final = SKILL_DIR / "assets" / "task-template"
 EXPECTED_CORE_PATHS: Final = frozenset(
     {
         "AGENTS.md",
