@@ -1,6 +1,8 @@
 ---
 name: init-work
 description: Use when the user requests init-work, 새 작업 생성, or initial planning, progress, and decision documents for a task in a project folder, with the output location chosen automatically or entered by the user.
+metadata:
+  version: "0.1.0"
 ---
 
 # Init Work

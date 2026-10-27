@@ -55,6 +55,7 @@ CLI는 대상 에이전트에 맞는 설치 위치와 연결을 관리한다. �
 ├── .gitignore
 ├── SKILL.md
 ├── README.md
+├── CHANGELOG.md
 ├── agents/openai.yaml
 ├── scripts/create_task.py
 ├── assets/task-template/
@@ -75,7 +76,7 @@ CLI는 대상 에이전트에 맞는 설치 위치와 연결을 관리한다. �
 $skillSource = (Get-Location).Path
 $skillExport = Join-Path ([System.IO.Path]::GetTempPath()) ('init-work-export-' + [guid]::NewGuid().ToString('N'))
 $skillFiles = @(
-    '.gitignore', 'SKILL.md', 'README.md', 'agents/openai.yaml',
+    '.gitignore', 'SKILL.md', 'README.md', 'CHANGELOG.md', 'agents/openai.yaml',
     'scripts/create_task.py',
     'assets/task-template/CLAUDE.md', 'assets/task-template/README.md',
     'assets/task-template/ROADMAP.md', 'assets/task-template/PROGRESS.md',
@@ -98,6 +99,27 @@ $skillExport
 ```
 
 출력된 경로를 로컬 설치 명령의 `<skill-source>`로 사용한다. 다른 셸에서도 같은 파일 목록을 빈 폴더에 복사한다. 저장소 전체를 재귀 복사하거나 설치 대상 프로젝트 안에 원본 폴더를 두지 않는다.
+
+## 버전 관리
+
+스킬 버전은 `SKILL.md` frontmatter의 `metadata.version` 값 하나를 기준으로 하며, 설치된 스킬에서도 같은 값을 확인할 수 있다. 버전은 [유의적 버전](https://semver.org/lang/ko/)(`MAJOR.MINOR.PATCH`)을 따르고 변경 내용은 `CHANGELOG.md`에 기록한다. main의 각 배포 커밋에는 같은 번호의 주석 태그 `vX.Y.Z`를 붙인다.
+
+| 올릴 자리 | 기준 |
+|---|---|
+| MAJOR | 호출하는 쪽이 바뀌어야 하는 변경 — 질문 순서·필수 입력, 생성 문서의 구성·이름, 템플릿 토큰, 생성기 CLI 옵션을 제거하거나 호환되지 않게 바꿈 |
+| MINOR | 기존 사용법을 유지한 기능 추가 |
+| PATCH | 버그 수정, 문구 정리, 동작이 같은 내부 변경 |
+
+1.0.0 전에는 호환을 깨는 변경도 MINOR로 올릴 수 있으며, 이 경우 `CHANGELOG.md`에 `변경` 항목으로 밝힌다. 배포 파일이 바뀌지 않는 변경(관리 저장소의 `AGENTS.md`·`CLAUDE.md`, `.remember/` 등)은 버전을 올리지 않는다.
+
+배포 절차는 다음과 같다.
+
+1. 작업 브랜치에서 변경할 때마다 `CHANGELOG.md`의 `[Unreleased]` 아래에 `추가`·`변경`·`수정`·`제거` 항목으로 적는다.
+2. main에 반영하기 전에 작업 브랜치에서 `metadata.version`을 올리고, `[Unreleased]` 항목을 `## [X.Y.Z] - YYYY-MM-DD`(KST) 절로 옮긴다. `[Unreleased]` 제목은 빈 채로 남긴다.
+3. main에 반영한 뒤 그 커밋에 `git tag -a vX.Y.Z -m "init-work X.Y.Z"`로 태그를 붙이고, main과 태그를 함께 push한다.
+4. push한 태그는 옮기거나 지우지 않는다. 배포 뒤 문제를 찾으면 새 PATCH 버전으로 고친다.
+
+`tests/test_distribution.py`는 `metadata.version`이 `CHANGELOG.md`의 가장 최근 배포 절 버전과 같은지 검사한다.
 
 ## 사용 방법
 
